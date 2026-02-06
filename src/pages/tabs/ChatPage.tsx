@@ -18,12 +18,84 @@ interface Message {
   text: string;
   sender: 'user' | 'bot';
   timestamp: Date;
+  showTelegramLink?: boolean;
 }
+
+// FAQ data for automatic responses
+const faqData = [
+  {
+    keywords: ['zakazsplit', 'закаизсплит', 'что такое', 'сервис'],
+    question: 'Что такое ZAKAZSPLIT?',
+    answer: 'ZAKAZSPLIT — это сервис для автоматизации работы с аккаунтами и заказами. Мы предоставляем инструменты для прогрева аккаунтов, управления эмуляторами и оформления заказов.',
+  },
+  {
+    keywords: ['начать', 'работу', 'начинать', 'старт', 'регистрация'],
+    question: 'Как начать работу?',
+    answer: 'Для начала работы вам нужно авторизоваться через Telegram, пополнить баланс и добавить свои аккаунты. После этого вы сможете использовать все функции сервиса.',
+  },
+  {
+    keywords: ['пополнение', 'оплата', 'способы', 'карта', 'криптовалюта', 'баланс', 'пополнить'],
+    question: 'Способы пополнения',
+    answer: 'Мы принимаем оплату через: банковские карты (Visa, MasterCard, МИР), криптовалюту (BTC, ETH, USDT), электронные кошельки (ЮMoney, QIWI) и СБП.',
+  },
+  {
+    keywords: ['прогрев', 'аккаунт', 'прогревать', 'траст', 'трастовость'],
+    question: 'Что такое прогрев?',
+    answer: 'Прогрев — это процесс имитации естественной активности на аккаунте для повышения его трастовости. Это включает просмотры, лайки, добавления в корзину и другие действия.',
+  },
+  {
+    keywords: ['безопасно', 'безопасность', 'риск', 'блокировка', 'бан'],
+    question: 'Безопасность',
+    answer: 'Да, мы используем продвинутые алгоритмы для имитации человеческого поведения, уникальные прокси для каждого аккаунта и современные методы обхода защиты.',
+  },
+  {
+    keywords: ['эмулятор', 'управление', 'устройство', 'виртуальный'],
+    question: 'Эмулятор управления',
+    answer: 'Эмулятор позволяет удалённо управлять виртуальными устройствами. Вы можете видеть экран устройства в реальном времени и выполнять любые действия.',
+  },
+  {
+    keywords: ['тариф', 'цена', 'стоимость', 'план', 'подписка'],
+    question: 'Тарифы',
+    answer: 'У нас есть несколько тарифов: Базовый (до 10 аккаунтов), Продвинутый (до 50 аккаунтов) и Профессиональный (безлимит). Подробности можно узнать в разделе "Пополнение".',
+  },
+  {
+    keywords: ['поддержка', 'помощь', 'связаться', 'контакт', 'оператор'],
+    question: 'Связь с поддержкой',
+    answer: 'Вы можете написать нам в чат поддержки прямо в личном кабинете, или в наш Telegram-бот @zakazsplit_support.',
+  },
+  {
+    keywords: ['сплит', 'split', 'лимит'],
+    question: 'Что такое SPLIT?',
+    answer: 'SPLIT (Сплит) — это максимальный лимит суммы заказа на аккаунте. Чем выше сплит, тем более дорогие товары можно заказывать через аккаунт.',
+  },
+];
+
+// Find best matching FAQ response
+const findFAQResponse = (userInput: string): string | null => {
+  const input = userInput.toLowerCase();
+  
+  let bestMatch: { answer: string; score: number } | null = null;
+  
+  for (const faq of faqData) {
+    let score = 0;
+    for (const keyword of faq.keywords) {
+      if (input.includes(keyword.toLowerCase())) {
+        score++;
+      }
+    }
+    
+    if (score > 0 && (!bestMatch || score > bestMatch.score)) {
+      bestMatch = { answer: faq.answer, score };
+    }
+  }
+  
+  return bestMatch ? bestMatch.answer : null;
+};
 
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: 'Привет! Я AI-ассистент ZAKAZSPLIT. Чем могу помочь?',
+    text: 'Привет! Я AI-ассистент ZAKAZSPLIT. Задайте мне вопрос, и я постараюсь помочь на основе нашей базы знаний.',
     sender: 'bot',
     timestamp: new Date(Date.now() - 60000)
   }
@@ -55,19 +127,24 @@ export const ChatPage: React.FC = () => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const userInput = input;
     setInput('');
     setIsTyping(true);
 
+    // Simulate typing delay
     setTimeout(() => {
+      const faqResponse = findFAQResponse(userInput);
+      
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: 'Спасибо за ваше сообщение! Наш оператор скоро ответит вам.',
+        text: faqResponse || 'К сожалению, я не нашёл ответа на ваш вопрос в базе знаний. Попробуйте переформулировать вопрос или свяжитесь с оператором.',
         sender: 'bot',
-        timestamp: new Date()
+        timestamp: new Date(),
+        showTelegramLink: true
       };
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
-    }, 1500);
+    }, 1000);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -82,29 +159,23 @@ export const ChatPage: React.FC = () => {
       {!user && <GuestOverlay onOpenAuth={onOpenAuth} />}
 
       {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <Card className="bg-black/30 border border-white/20 backdrop-blur-sm mb-4">
-          <CardHeader className="py-4">
-            <CardTitle className="text-lg text-foreground flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/20">
-                <MessageCircle className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-foreground">Чат поддержки</p>
-                <p className="text-xs text-muted-foreground font-normal flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-400" />
-                  AI-ассистент онлайн
-                </p>
-              </div>
-              <Sparkles className="w-4 h-4 text-yellow-400 ml-auto" />
-            </CardTitle>
-          </CardHeader>
-        </Card>
-      </motion.div>
+      <Card className="bg-black/30 border border-white/20 backdrop-blur-sm mb-4">
+        <CardHeader className="py-4">
+          <CardTitle className="text-lg text-foreground flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/20">
+              <MessageCircle className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-foreground">Чат поддержки</p>
+              <p className="text-xs text-muted-foreground font-normal flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-green-400" />
+                AI-ассистент онлайн
+              </p>
+            </div>
+            <Sparkles className="w-4 h-4 text-yellow-400 ml-auto" />
+          </CardTitle>
+        </CardHeader>
+      </Card>
 
       {/* Messages */}
       <Card className="bg-black/30 border border-white/20 flex-1 flex flex-col overflow-hidden">
@@ -135,6 +206,24 @@ export const ChatPage: React.FC = () => {
                     : 'bg-white/10 text-foreground rounded-tl-sm'
                 }`}>
                   <p className="text-sm">{message.text}</p>
+                  
+                  {/* Telegram link for bot messages */}
+                  {message.sender === 'bot' && message.showTelegramLink && (
+                    <div className="mt-3 pt-3 border-t border-white/10">
+                      <p className="text-xs text-muted-foreground">
+                        Ваш вопрос не решён?{' '}
+                        <a 
+                          href="https://t.me/zakazsplit_support" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-primary hover:text-primary/80 transition-colors font-medium"
+                        >
+                          Telegram →
+                        </a>
+                      </p>
+                    </div>
+                  )}
+                  
                   <p className={`text-xs mt-1 ${
                     message.sender === 'user' ? 'text-white/60' : 'text-muted-foreground'
                   }`}>
