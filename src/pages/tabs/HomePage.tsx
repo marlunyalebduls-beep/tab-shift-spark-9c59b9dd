@@ -112,7 +112,7 @@ export const HomePage: React.FC = () => {
               transition={{ delay: 0.2 + index * 0.1, duration: 0.4 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate(tile.path)}
-              className="aspect-square rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm cursor-pointer flex flex-col items-center justify-center gap-3 hover:bg-card/80 hover:border-primary/30 transition-all duration-300"
+              className="aspect-[4/3] rounded-xl bg-card/60 border border-border/50 backdrop-blur-sm cursor-pointer flex flex-col items-center justify-center gap-2 hover:bg-card/80 hover:border-primary/30 transition-all duration-300"
             >
               <div className={`w-12 h-12 rounded-xl ${tile.bgColor} border ${tile.borderColor} flex items-center justify-center`}>
                 <tile.Icon className={`w-6 h-6 ${tile.iconColor}`} />
