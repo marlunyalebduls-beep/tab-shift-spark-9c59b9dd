@@ -156,7 +156,7 @@ export const ChatPage: React.FC = () => {
 
   return (
     <div className="relative h-[calc(100vh-200px)] flex flex-col">
-      {!user && <GuestOverlay onOpenAuth={onOpenAuth} />}
+      {user === null && <GuestOverlay onOpenAuth={onOpenAuth} />}
 
       {/* Header */}
       <Card className="bg-black/30 border border-white/20 backdrop-blur-sm mb-4">

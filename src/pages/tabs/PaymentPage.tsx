@@ -30,7 +30,7 @@ export const PaymentPage: React.FC = () => {
 
   return (
     <div className="relative min-h-full">
-      {!user && <GuestOverlay onOpenAuth={onOpenAuth} />}
+      {user === null && <GuestOverlay onOpenAuth={onOpenAuth} />}
 
       <motion.div 
         className="space-y-6"
