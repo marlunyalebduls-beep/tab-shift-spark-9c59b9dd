@@ -382,7 +382,7 @@ export const AccountsPage: React.FC = () => {
               <HelpCircle className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-72 glass-card p-3 text-sm">
+          <PopoverContent className="w-72 bg-black/95 border border-white/20 p-3 text-sm">
             <p className="text-muted-foreground leading-relaxed">
               Определитесь с выбором аккаунта: <span className="text-green-400 font-medium">быстрый старт</span> — гретые аккаунты готовые к заказу, <span className="text-yellow-400 font-medium">догрев</span> — покупают с целью получения высокого лимита.
             </p>
@@ -604,59 +604,76 @@ export const AccountsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Accounts Grid */}
+      {/* Accounts Grid - Matching reference design */}
       <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 transition-all duration-500 ${currentHighlight === 'accounts' ? 'ring-2 ring-primary rounded-xl p-2 relative z-[110]' : ''}`}>
         {filteredAccounts.map((account) => {
           const isSelected = selectedAccounts.includes(account.id);
           return (
             <Card 
               key={account.id}
-              className={`cursor-pointer transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] ${
+              className={`cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] bg-[#0a1628]/80 border-[#1e3a5f]/60 hover:border-[#2a5a8f]/80 ${
                 isSelected 
-                  ? 'bg-primary/20 border-primary ring-2 ring-primary/50' 
-                  : 'glass-card hover:border-white/20'
+                  ? 'border-primary ring-2 ring-primary/50' 
+                  : ''
               }`}
               onClick={() => toggleAccountSelection(account.id)}
             >
-              <CardContent className="p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Checkbox checked={isSelected} />
-                    <span className="text-foreground font-medium text-sm">{account.name}</span>
+              <CardContent className="p-5 space-y-3">
+                {/* Header with name and checkbox */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Checkbox checked={isSelected} className="border-white/30" />
+                    <span className="text-foreground font-semibold">{account.name}</span>
                   </div>
                   {account.emulation_status.includes('Готов') && (
-                    <CheckCircle className="w-4 h-4 text-green-400" />
+                    <CheckCircle className="w-5 h-5 text-green-400" />
                   )}
                 </div>
 
-                <div>
-                  <p className="text-xs text-muted-foreground">ID:</p>
-                  <p className="text-foreground font-mono text-xs">{account.id}</p>
+                {/* ID */}
+                <div className="space-y-1">
+                  <span className="text-xs text-muted-foreground">ID:</span>
+                  <p className="text-foreground/80 font-mono text-xs truncate">{account.id}</p>
                 </div>
                 
-                <div>
-                  <div className="flex items-center gap-1 mb-1">
-                    <Zap className="w-4 h-4 text-yellow-400" />
-                    <span className="text-xs text-muted-foreground">SPLIT:</span>
+                {/* Split with icon and badge */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Сплит:</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-green-500" />
+                    </div>
+                    <span className="px-3 py-1 bg-[#0d2137] border border-[#1e4a6f] rounded text-foreground font-semibold text-sm">
+                      {account.split.toLocaleString('ru-RU')} RUB
+                    </span>
                   </div>
-                  <p className="text-foreground font-semibold">{formatSplit(account.split)}</p>
                 </div>
 
-                <div>
-                  <p className="text-xs text-muted-foreground">Цена:</p>
-                  <p className="text-green-400 font-semibold">{formatCurrency(account.price)}</p>
+                {/* Price */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Цена:</span>
+                  <span className="text-foreground font-medium">{formatCurrency(account.price)}</span>
                 </div>
                 
-                <div className="flex items-center space-x-2">
-                  <MapPin className="w-3 h-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    {account.city === 'Неизвестно' ? 'Любой город' : account.city}
-                  </span>
+                {/* City */}
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">Город:</span>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-cyan-400" />
+                    <span className="text-cyan-400 text-sm">
+                      {account.city === 'Неизвестно' ? 'Любой город' : account.city}
+                    </span>
+                  </div>
                 </div>
                 
-                <div>
-                  <p className="text-xs text-muted-foreground">Эмуляция:</p>
-                  <p className="text-xs font-medium text-green-400">{account.emulation_status}</p>
+                {/* Status badge at bottom */}
+                <div className="pt-2">
+                  <span className="text-muted-foreground text-sm">Статус:</span>
+                  <div className="mt-2">
+                    <span className="inline-block px-3 py-1.5 border border-green-500/50 rounded text-green-400 text-xs font-medium">
+                      {account.emulation_status}
+                    </span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
