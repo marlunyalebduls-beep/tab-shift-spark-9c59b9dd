@@ -478,13 +478,9 @@ export const AccountsPage: React.FC = () => {
           key={showReadyOnly ? 'ready' : 'warmup'}
           initial={{ opacity: 0, y: -5 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mt-3 px-4 py-3 rounded-lg border ${
-            showReadyOnly 
-              ? 'bg-green-500/15 border-green-500/30' 
-              : 'bg-yellow-500/15 border-yellow-500/30'
-          }`}
+          className="mt-3 px-4 py-3 rounded-lg glass-card"
         >
-          <span className="inline-block px-3 py-1.5 bg-gray-900/80 rounded-md">
+          <span className="inline-block px-3 py-1.5 bg-black/80 rounded-md">
             <span className="text-sm font-medium text-white">
               {showReadyOnly 
                 ? 'Быстрый старт — аккаунты готовые уже к заказу.' 
